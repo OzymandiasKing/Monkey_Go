@@ -15,15 +15,6 @@ func New(input string) *Lexer {
 	return l
 }
 
-/*
-*
-readChar的目的是读取input中的下一个字符，并前移其在input中的位置。这个过程的第一件事就是检查是否已经到达input的末尾。
-如果是，则将l.ch设置为0，这是NUL字符的ASCII编码，用来表示“尚未读取任何内容”或“文件结尾”。如果还没有到达input的末尾，
-则将l.ch设置为下一个字符，即l.input[l.readPosition]指向的字符。之后，将l.position更新为刚用过的l.readPosition，
-然后将l.readPosition加1。这样一来，l.readPosition就始终指向下一个将读取的字符位置，而l.position始终指向刚刚读取的位置。
-该词法分析器仅支持ASCII字符，不能支持所有的Unicode字符。
-*/
-
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
@@ -68,10 +59,17 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = newToken(token.BANG, l.ch)
 		}
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
 	case '{':
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch)
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -126,6 +124,17 @@ func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.ch) {
 		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+func (l *Lexer) readString() string {
+	position := l.position + 1
+	for {
+		l.readChar()
+		if l.ch == '"' || l.ch == 0 {
+			break
+		}
 	}
 	return l.input[position:l.position]
 }
