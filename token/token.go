@@ -48,6 +48,8 @@ const (
 	LBRACKET = "["
 	RBRACKET = "]"
 
+	COLON = ":"
+
 	// CHARACTER TODO: ADD CHARACTER
 	CHARACTER = "CHARACTER"
 )

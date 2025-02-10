@@ -27,6 +27,14 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		line := scanner.Text()
+
+		// 检查是否为 clean 指令
+		if line == "clear" {
+			// 清空命令行
+			io.WriteString(out, "\033[2J\033[H")
+			continue
+		}
+
 		l := lexer.New(line)
 		p := parser.New(l)
 
