@@ -365,7 +365,3 @@ func isError(obj object.Object) bool {
 	}
 	return false
 }
-
-//func quote(node ast.Node) object.Object {
-//	return &object.Quote{Node: node}
-//}

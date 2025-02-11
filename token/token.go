@@ -50,6 +50,8 @@ const (
 
 	COLON = ":"
 
+	MACRO = "MACRO"
+
 	// CHARACTER TODO: ADD CHARACTER
 	CHARACTER = "CHARACTER"
 )
@@ -62,6 +64,7 @@ var keywords = map[string]TokenType{
 	"return": RETURN,
 	"true":   TRUE,
 	"false":  FALSE,
+	"macro":  MACRO,
 }
 
 func LookupIdent(ident string) TokenType {
