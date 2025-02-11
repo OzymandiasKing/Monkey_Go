@@ -8,6 +8,7 @@ import (
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
+	"strings"
 )
 
 const PROMPT = ">>"
@@ -16,6 +17,8 @@ func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
 	macroEnv := object.NewEnvironment()
+
+	var input string
 
 	for {
 		_, err := fmt.Fprintf(out, PROMPT)
@@ -26,7 +29,6 @@ func Start(in io.Reader, out io.Writer) {
 		if !scanned {
 			return
 		}
-
 		line := scanner.Text()
 
 		// 检查是否为 clean 指令
@@ -36,7 +38,14 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		l := lexer.New(line)
+		if len(line) > 0 && line[len(line)-1] == '\\' {
+			line = strings.TrimRight(line, "\\")
+			input += line[:len(line)-1]
+			continue
+		}
+		input += line
+
+		l := lexer.New(input)
 		p := parser.New(l)
 
 		program := p.ParseProgram()
