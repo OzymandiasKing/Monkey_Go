@@ -146,3 +146,83 @@ func TestNextToken(t *testing.T) {
 	}
 
 }
+
+func TestStringToken(t *testing.T) {
+	input := `
+				"foobar"
+				let str = "new string";
+			 `
+	tests := []struct {
+		expectedType    token.TokenType
+		expectedLiteral string
+	}{
+		{token.STRING, "foobar"},
+		{token.LET, "let"},
+		{token.IDENT, "str"},
+		{token.ASSIGN, "="},
+		{token.STRING, "new string"},
+		{token.SEMICOLON, ";"},
+		{token.EOF, ""},
+	}
+	l := New(input)
+	t.Logf("input:%s", input)
+	t.Logf("input length is: %d", len(input))
+	for i, tt := range tests {
+		tok := l.NextToken()
+		if tok.Type != tt.expectedType {
+			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
+		}
+		if tok.Literal != tt.expectedLiteral {
+			t.Fatalf("tests[%d] - literal wrong. expected=%q, got=%q", i, tt.expectedLiteral, tok.Literal)
+		}
+	}
+}
+
+func TestCharacterToken(t *testing.T) {
+	input := `
+				'a'
+				'b'
+				'c'
+				'd'
+				'e'
+				'f'
+				'g'
+				'h'
+				'i'
+				'j'
+				'k'
+				'l'
+				'm'
+				'n'
+				'o'
+				'p'
+				'q'
+				'r'
+				's'
+	`
+	tests := []struct {
+		expectedType    token.TokenType
+		expectedLiteral string
+	}{
+		{token.CHARACTER, "a"},
+		{token.CHARACTER, "b"},
+		{token.CHARACTER, "c"},
+		{token.CHARACTER, "d"},
+		{token.CHARACTER, "e"},
+		{token.CHARACTER, "f"},
+		{token.CHARACTER, "g"},
+		{token.CHARACTER, "h"},
+		{token.CHARACTER, "i"},
+		{token.CHARACTER, "j"},
+	}
+	l := New(input)
+	for i, tt := range tests {
+		tok := l.NextToken()
+		if tok.Type != tt.expectedType {
+			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
+		}
+		if tok.Literal != tt.expectedLiteral {
+			t.Fatalf("tests[%d] - literal wrong. expected=%q, got=%q", i, tt.expectedLiteral, tok.Literal)
+		}
+	}
+}

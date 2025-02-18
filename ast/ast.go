@@ -299,6 +299,11 @@ func (sl *StringLiteral) String() string {
 	return sl.Token.Literal
 }
 
+type CharacterLiteral struct {
+	Token token.Token
+	Value byte
+}
+
 type ArrayLiteral struct {
 	Token    token.Token
 	Elements []Expression
