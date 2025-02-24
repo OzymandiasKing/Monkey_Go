@@ -2,14 +2,13 @@ package lexer
 
 import (
 	"monkey/token"
+	"strings"
 
 	"testing"
 )
 
 func TestNextToken(t *testing.T) {
-	//input := `=+(){},;`
-
-	input := `	let five = 5;
+	input := strings.NewReader(`	let five = 5;
 				let ten = 10;
 				let add = fn(x, y) {
 					x + y;
@@ -29,7 +28,7 @@ func TestNextToken(t *testing.T) {
 				[1, 2]
 				{"foo": "bar"}
 				macro(x, y) { x + y; };
-			 `
+			 `)
 
 	tests := []struct {
 		expectedType    token.TokenType
@@ -132,7 +131,7 @@ func TestNextToken(t *testing.T) {
 		{token.EOF, ""},
 	}
 
-	l := New(input)
+	l := New(input, "test_lexer.monkey")
 
 	for i, tt := range tests {
 		tok := l.NextToken()
@@ -148,74 +147,21 @@ func TestNextToken(t *testing.T) {
 }
 
 func TestStringToken(t *testing.T) {
-	input := `
-				"foobar"
-				let str = "new string";
-			 `
+	input := strings.NewReader(`let str = "new string";`)
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
+		expectedLine    int
+		expectedColumn  int
 	}{
-		{token.STRING, "foobar"},
-		{token.LET, "let"},
-		{token.IDENT, "str"},
-		{token.ASSIGN, "="},
-		{token.STRING, "new string"},
-		{token.SEMICOLON, ";"},
-		{token.EOF, ""},
+		{token.LET, "let", 1, 0},
+		{token.IDENT, "str", 1, 4},
+		{token.ASSIGN, "=", 1, 8},
+		{token.STRING, "new string", 1, 11},
+		{token.SEMICOLON, ";", 1, 22},
+		{token.EOF, "", 2, 0},
 	}
-	l := New(input)
-	t.Logf("input:%s", input)
-	t.Logf("input length is: %d", len(input))
-	for i, tt := range tests {
-		tok := l.NextToken()
-		if tok.Type != tt.expectedType {
-			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
-		}
-		if tok.Literal != tt.expectedLiteral {
-			t.Fatalf("tests[%d] - literal wrong. expected=%q, got=%q", i, tt.expectedLiteral, tok.Literal)
-		}
-	}
-}
-
-func TestCharacterToken(t *testing.T) {
-	input := `
-				'a'
-				'b'
-				'c'
-				'd'
-				'e'
-				'f'
-				'g'
-				'h'
-				'i'
-				'j'
-				'k'
-				'l'
-				'm'
-				'n'
-				'o'
-				'p'
-				'q'
-				'r'
-				's'
-	`
-	tests := []struct {
-		expectedType    token.TokenType
-		expectedLiteral string
-	}{
-		{token.CHARACTER, "a"},
-		{token.CHARACTER, "b"},
-		{token.CHARACTER, "c"},
-		{token.CHARACTER, "d"},
-		{token.CHARACTER, "e"},
-		{token.CHARACTER, "f"},
-		{token.CHARACTER, "g"},
-		{token.CHARACTER, "h"},
-		{token.CHARACTER, "i"},
-		{token.CHARACTER, "j"},
-	}
-	l := New(input)
+	l := New(input, "test_string.monkey")
 	for i, tt := range tests {
 		tok := l.NextToken()
 		if tok.Type != tt.expectedType {

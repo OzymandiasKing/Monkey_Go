@@ -2,9 +2,16 @@ package token
 
 type TokenType string
 
+type Position struct {
+	Line     int
+	Filename string
+	Column   int
+}
+
 type Token struct {
 	Type    TokenType
 	Literal string
+	Pos     Position
 }
 
 const (
