@@ -25,7 +25,7 @@ func New(bytecode *compiler.Bytecode) *VM {
 	}
 }
 
-func (vm *VM) stackTop() object.Object {
+func (vm *VM) StackTop() object.Object {
 	if vm.sp == 0 {
 		return nil
 	}
@@ -43,6 +43,16 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpAdd:
+			right := vm.pop()
+			left := vm.pop()
+			leftValue := left.(*object.Integer).Value
+			rightValue := right.(*object.Integer).Value
+			result := object.Integer{Value: leftValue + rightValue}
+			err := vm.push(&result)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -55,4 +65,13 @@ func (vm *VM) push(obj object.Object) error {
 	vm.stack[vm.sp] = obj
 	vm.sp++
 	return nil
+}
+
+func (vm *VM) pop() object.Object {
+	if vm.sp == 0 {
+		return nil
+	}
+	obj := vm.stack[vm.sp-1]
+	vm.sp--
+	return obj
 }

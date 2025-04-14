@@ -4,63 +4,46 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"monkey/evaluator"
+	"monkey/compiler"
 	"monkey/lexer"
-	"monkey/object"
 	"monkey/parser"
-	"strings"
+	"monkey/vm"
 )
 
 const PROMPT = ">>"
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
-	env := object.NewEnvironment()
-	macroEnv := object.NewEnvironment()
-
-	var input string
 
 	for {
-		_, err := fmt.Fprintf(out, PROMPT)
-		if err != nil {
-			panic(err)
-		}
+		fmt.Fprintf(out, PROMPT)
 		scanned := scanner.Scan()
 		if !scanned {
 			return
 		}
 		line := scanner.Text()
-
-		// 检查是否为 clean 指令
-		if line == "clear" {
-			// 清空命令行
-			io.WriteString(out, "\033[2J\033[H")
-			continue
-		}
-
-		if len(line) > 0 && line[len(line)-1] == '\\' {
-			line = strings.TrimRight(line, "\\")
-			input += line[:len(line)-1]
-			continue
-		}
-		input += line
-
-		l := lexer.New(input)
+		l := lexer.New(line)
 		p := parser.New(l)
-
 		program := p.ParseProgram()
-		evaluator.DefineMacros(program, macroEnv)
-		expanded := evaluator.ExpandMacros(program, macroEnv)
 		if len(p.Errors()) != 0 {
 			printParserErrors(out, p.Errors())
 			continue
 		}
-
-		evaluated := evaluator.Eval(expanded, env)
-		if evaluated != nil {
-			io.WriteString(out, evaluated.Inspect())
-			io.WriteString(out, "\n")
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+			continue
 		}
+		machine := vm.New(comp.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+			continue
+		}
+		stackTop := machine.StackTop()
+		io.WriteString(out, stackTop.Inspect())
+		io.WriteString(out, "\n")
 	}
 }
 
