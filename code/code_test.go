@@ -12,6 +12,7 @@ func TestMake(t *testing.T) {
 	}{
 		{OpConstant, []int{65534}, []byte{byte(OpConstant), 255, 254}},
 		{OpAdd, []int{}, []byte{byte(OpAdd)}},
+		{OpGetLocal, []int{255}, []byte{byte(OpGetLocal), 255}},
 	}
 	for _, tt := range tests {
 		instruction := Make(tt.op, tt.operands...)
@@ -28,24 +29,22 @@ func TestMake(t *testing.T) {
 
 func TestInstructionsString(t *testing.T) {
 	instructions := []Instructions{
-		Make(OpConstant, 1),
+		Make(OpAdd),
+		Make(OpGetLocal, 1),
 		Make(OpConstant, 2),
 		Make(OpConstant, 65535),
-		Make(OpAdd),
-		Make(OpConstant, 4),
 	}
-	expected := `0000 OpConstant 1
+	expected := `0000 OpAdd
+0001 OpGetLocal 1
 0003 OpConstant 2
 0006 OpConstant 65535
-0009 OpAdd
-0010 OpConstant 4
 `
 	concated := Instructions{}
 	for _, ins := range instructions {
 		concated = append(concated, ins...)
 	}
 	if concated.String() != expected {
-		t.Errorf("instructions wrongly formatted.\nwant=%q\ngot=%q", expected, concated.String())
+		t.Errorf("instructions wrongly formatted.\nwant = %q\ngot  = %q", expected, concated.String())
 	}
 }
 
@@ -56,6 +55,7 @@ func TestReadOperands(t *testing.T) {
 		bytesRead int
 	}{
 		{OpConstant, []int{65535}, 2},
+		{OpGetLocal, []int{255}, 1},
 	}
 	for _, tt := range tests {
 		instruction := Make(tt.op, tt.operands...)
