@@ -29,6 +29,8 @@ const (
 	QUOTE_OBJ = "QUOTE"
 
 	MACRO_OBJ = "MACRO"
+
+	CLOSURE_OBJ = "CLOSURE"
 )
 
 type Object interface {
@@ -256,4 +258,16 @@ func (m *Macro) Inspect() string {
 }
 func (m *Macro) Type() ObjectType {
 	return MACRO_OBJ
+}
+
+type Closure struct {
+	Fn   *CompiledFunction
+	Free []Object
+}
+
+func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
+}
+func (c *Closure) Type() ObjectType {
+	return CLOSURE_OBJ
 }
