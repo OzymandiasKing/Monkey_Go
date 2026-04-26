@@ -4,6 +4,7 @@ import (
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
+	"strings"
 	"testing"
 )
 
@@ -526,7 +527,7 @@ func TestQuoteUnquote(t *testing.T) {
 			`(4 + 4)`,
 		},
 		{
-			`let quotedInfixExpression = quote(4 + 4); quote(unquote(4 + 4) + unquote(quoteInfixExpression))`,
+			`let quotedInfixExpression = quote(4 + 4); quote(unquote(4 + 4) + unquote(quotedInfixExpression))`,
 			`(8 + (4 + 4))`,
 		},
 	}
@@ -551,7 +552,7 @@ func TestQuoteUnquote(t *testing.T) {
 }
 
 func testEval(input string) object.Object {
-	l := lexer.New(input)
+	l := lexer.New(strings.NewReader(input), "test")
 	p := parser.New(l)
 	program := p.ParseProgram()
 	env := object.NewEnvironment()

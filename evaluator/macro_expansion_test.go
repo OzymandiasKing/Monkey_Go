@@ -5,6 +5,7 @@ import (
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
+	"strings"
 	"testing"
 )
 
@@ -104,7 +105,7 @@ func TestExpandMacros(t *testing.T) {
 }
 
 func testParseProgram(input string) *ast.Program {
-	l := lexer.New(input)
+	l := lexer.New(strings.NewReader(input), "test")
 	p := parser.New(l)
 	return p.ParseProgram()
 }
