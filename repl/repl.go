@@ -45,7 +45,7 @@ func Start(in io.Reader, out io.Writer) {
 		}
 		input += line
 
-		l := lexer.New(input)
+		l := lexer.New(strings.NewReader(input), "repl")
 		p := parser.New(l)
 
 		program := p.ParseProgram()

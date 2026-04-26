@@ -145,31 +145,35 @@ func (l *Lexer) peekChar() byte {
 	return bytes[0]
 }
 
+// readIdentifier 读取标识符（变量名、函数名等）
+// 修改意图：修复字符读取错位问题
+// 原实现使用 Peek(1) 检查下一个字符后调用 readChar()，导致循环结束时 l.ch 指向标识符的最后一个字符
+// 新实现先通过 peekChar() 预读判断，再调用 readChar() 读取，最后额外调用一次 readChar() 确保 l.ch 指向下一个待处理字符
+// 这样保证词法分析器在返回标识符后能正确定位到下一个字符位置
 func (l *Lexer) readIdentifier() string {
 	var buf bytes.Buffer
 	buf.WriteByte(l.ch)
-	for {
-		nextChar, err := l.input.Peek(1)
-		if err != nil || !isLetter(nextChar[0]) {
-			break
-		}
-		l.readChar() // 会更新 l.ch
-		buf.WriteByte(l.ch)
-	}
-	return buf.String()
-}
-
-func (l *Lexer) readNumber() string {
-	var buf bytes.Buffer
-	buf.WriteByte(l.ch)
-	for {
-		nextChar, err := l.input.Peek(1)
-		if err != nil || !isDigit(nextChar[0]) {
-			break
-		}
+	for isLetter(l.peekChar()) {
 		l.readChar()
 		buf.WriteByte(l.ch)
 	}
+	l.readChar() // 移动到下一个字符（关键修复：确保循环结束后 l.ch 指向标识符之后的字符）
+	return buf.String()
+}
+
+// readNumber 读取数字字面量
+// 修改意图：修复字符读取错位问题（同 readIdentifier）
+// 原实现在循环中使用 Peek(1) 检查后读取，导致函数返回时 l.ch 停留在数字的最后一位
+// 这会导致 NextToken() 末尾的 readChar() 跳过下一个有效字符
+// 新实现确保读完数字后，l.ch 正确指向数字之后的下一个待处理字符
+func (l *Lexer) readNumber() string {
+	var buf bytes.Buffer
+	buf.WriteByte(l.ch)
+	for isDigit(l.peekChar()) {
+		l.readChar()
+		buf.WriteByte(l.ch)
+	}
+	l.readChar() // 移动到下一个字符（关键修复：确保循环结束后 l.ch 指向数字之后的字符）
 	return buf.String()
 }
 

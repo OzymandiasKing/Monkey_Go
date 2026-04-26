@@ -1,21 +1,85 @@
+```
+# Compiled and build artifacts
+*.o
+*.obj
+*.out
 *.exe
-*.exe~
 *.dll
 *.so
-*.dylib
+*.a
 
-# Test binary, built with `go test -c`
-*.test
+# Dependencies
+vendor/
+*.mod
+*.sum
 
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Editors
+.vscode/
+.idea/
 
-# Go workspace file
-go.work
-go.work.sum
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
-# env file
+# Environment
 .env
+.env.local
+*.env.*
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Node specific
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Go specific
+*.test
+*.prof
+
+# Compression
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# System files
+.DS_Store
+Thumbs.db
+```
